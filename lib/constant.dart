@@ -8,15 +8,15 @@ class TimeStamp {
   }
 }
 
-var kTaskStyle = GoogleFonts.lato(
-  fontWeight: FontWeight.bold,
-  fontSize: 30,
-  color: Colors.black,
-);
-var kListStyle = GoogleFonts.lato(
-  fontSize: 30,
-  color: Colors.black,
-);
+kTaskStyle({required bool needWhite}) => GoogleFonts.lato(
+      fontWeight: FontWeight.bold,
+      fontSize: 30,
+      color: needWhite ? Colors.white : Colors.black,
+    );
+kListStyle({required bool needWhite}) => GoogleFonts.lato(
+      fontSize: 30,
+      color: needWhite ? Colors.white : Colors.black,
+    );
 var kTaskNameStyle = GoogleFonts.lato(
   fontSize: 18,
   color: Colors.white,
@@ -45,9 +45,19 @@ var kBottomAppBarStyle = GoogleFonts.lato(
   fontSize: 18,
   color: Colors.white,
 );
-var kLabelTextStyle = GoogleFonts.lato(
-  color: Color(0xffcbcbcb),
-);
-var kHintTextStyle = GoogleFonts.lato(
-  color: Color(0xffcbcbcb),
-);
+kLabelTextStyle({required bool needWhite}) => GoogleFonts.lato(
+      color: Color(needWhite ? 0xffffffff : 0xffcbcbcb),
+    );
+kHintTextStyle({required bool needWhite}) => GoogleFonts.lato(
+      color: Color(needWhite ? 0xffffffff : 0xffcbcbcb),
+    );
+
+kTaskNowOrComing({required String status}) => GoogleFonts.lato(
+      color: Colors.black,
+    );
+
+kFullListTask({required dynamic colorCode}) => GoogleFonts.lato(
+      fontWeight: FontWeight.w800,
+      fontSize: 20,
+      color: Color(colorCode),
+    );

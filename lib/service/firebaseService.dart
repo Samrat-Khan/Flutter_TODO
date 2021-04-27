@@ -7,6 +7,9 @@ class Todo {
       {required List<String?> tasks,
       required int timestamp,
       required dynamic color,
+      required int day,
+      required int month,
+      required int year,
       required BuildContext context,
       required String taskName}) async {
     Set<Map<String, dynamic?>> map = {
@@ -20,32 +23,11 @@ class Todo {
         "taskName": taskName,
         "timeStamp": timestamp,
         "colorCode": color,
-        "dateTime": {
-          "day": DateTime.now().day,
-          "month": DateTime.now().month,
-          "year": DateTime.now().year
-        }
+        "dateTime": {"day": day, "month": month, "year": year}
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         Todo.showErrorMessage(message: "An error occurred"),
-      );
-    }
-  }
-
-  Future updateTodo(
-      {required bool isComplete,
-      required int timestamp,
-      required int arrIndex,
-      required BuildContext context}) async {
-    print("$arrIndex Array index");
-    try {
-      await _firestore.collection("Todo").doc(timestamp.toString()).update({
-        "taskList${[arrIndex]}.isComplete": isComplete,
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        Todo.showErrorMessage(message: e.toString()),
       );
     }
   }

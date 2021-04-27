@@ -4,6 +4,7 @@ import 'package:todo_app/constant.dart';
 import 'package:todo_app/screens/addTodoTask.dart';
 import 'package:todo_app/service/firebaseService.dart';
 import 'package:todo_app/widget/appBar.dart';
+import 'package:todo_app/widget/taskWidget.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -31,8 +32,10 @@ class _HomeState extends State<Home> {
                 RichText(
                   text: TextSpan(
                     children: [
-                      TextSpan(text: "Task", style: kTaskStyle),
-                      TextSpan(text: "Lists", style: kListStyle),
+                      TextSpan(
+                          text: "Task", style: kTaskStyle(needWhite: false)),
+                      TextSpan(
+                          text: "Lists", style: kListStyle(needWhite: false)),
                     ],
                   ),
                 ),
@@ -60,6 +63,7 @@ class _HomeState extends State<Home> {
                   child: StreamBuilder<QuerySnapshot>(
                       stream: FirebaseFirestore.instance
                           .collection("Todo")
+                          .orderBy("timeStamp", descending: true)
                           .snapshots(),
                       builder: (context, snapshot) {
                         QuerySnapshot? querySnapshot = snapshot.data;
@@ -89,8 +93,13 @@ class _HomeState extends State<Home> {
                               final dynamic colorCode = data["colorCode"];
                               return Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: taskListWidget(_size, colorCode,
-                                    taskName!, taskList, timeStamp!),
+                                child: TaskListWidget(
+                                    size: _size,
+                                    colorCode: colorCode,
+                                    dateTime: dateTime,
+                                    taskName: taskName!,
+                                    taskList: taskList,
+                                    timeStamp: timeStamp!),
                               );
                             },
                           );
@@ -108,72 +117,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Container taskListWidget(
-      Size _size, colorCode, String taskName, List taskList, int timeStamp) {
-    return Container(
-      width: _size.width / 1.7,
-      height: _size.height,
-      decoration: BoxDecoration(
-        color: Color(colorCode),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.only(right: 20, top: 20),
-        child: Container(
-          width: _size.width,
-          height: _size.height,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                taskName,
-                style: kTaskNameStyle,
-                softWrap: true,
-              ),
-              SizedBox(height: 10),
-              Divider(
-                color: Colors.white,
-              ),
-              Container(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: taskList.length,
-                  itemBuilder: (context, i) {
-                    String? taskTodoName = taskList[i]["taskName"];
-                    return ListTile(
-                      leading: Icon(
-                        Icons.note,
-                        color: Colors.white,
-                      ),
-                      title: Text(
-                        taskTodoName!,
-                        style: kTaskNotComplete,
-                        softWrap: true,
-                        overflow: TextOverflow.clip,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Todo todo = Todo();
-  updateTaskTodo(
-      {required int? timestamp,
-      required bool? isComplete,
-      required int? arrIndex}) async {
-    await todo.updateTodo(
-        isComplete: isComplete!,
-        timestamp: timestamp!,
-        arrIndex: arrIndex!,
-        context: context);
-  }
 
   addTask() {
     Navigator.push(

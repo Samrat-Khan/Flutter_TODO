@@ -18,17 +18,17 @@ class _AddTodoTaskState extends State<AddTodoTask> {
   Random random = Random();
   List<String?> extractedTaskList = [];
   bool _isUploading = false;
-
+  DateTime finalDateTime = DateTime.now();
   List<dynamic> colorCode = [
     0xffff2e44,
-    0xffffe546,
+    0xff27ad61,
     0xff1440a1,
     0xff504da6,
     0xfff374c1,
     0xfffabb18
   ];
   dynamic? selectedColorCode;
-
+  bool colorIsSelectByUser = false;
   @override
   void dispose() {
     super.dispose();
@@ -65,8 +65,14 @@ class _AddTodoTaskState extends State<AddTodoTask> {
                       SizedBox(height: 35),
                       RichText(
                         text: TextSpan(children: [
-                          TextSpan(text: "New", style: kListStyle),
-                          TextSpan(text: "Task", style: kTaskStyle),
+                          TextSpan(
+                              text: "New",
+                              style:
+                                  kListStyle(needWhite: colorIsSelectByUser)),
+                          TextSpan(
+                              text: "Task",
+                              style:
+                                  kTaskStyle(needWhite: colorIsSelectByUser)),
                         ]),
                       ),
                       SizedBox(height: 50),
@@ -77,12 +83,16 @@ class _AddTodoTaskState extends State<AddTodoTask> {
                           controller: _taskName,
                           decoration: InputDecoration(
                             hintText: "Goto Supermarket",
-                            hintStyle: kHintTextStyle,
+                            hintStyle:
+                                kHintTextStyle(needWhite: colorIsSelectByUser),
                             labelText: "Task Name",
-                            labelStyle: kLabelTextStyle,
+                            labelStyle:
+                                kLabelTextStyle(needWhite: colorIsSelectByUser),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: Color(0xffcbcbcb),
+                                color: Color(colorIsSelectByUser
+                                    ? 0xffffffff
+                                    : 0xffcbcbcb),
                               ),
                             ),
                           ),
@@ -94,20 +104,37 @@ class _AddTodoTaskState extends State<AddTodoTask> {
                         child: TextField(
                           keyboardType: TextInputType.multiline,
                           controller: _taskList,
-                          maxLines: 10,
+                          maxLines: 8,
                           decoration: InputDecoration(
                             hintText: "Task List",
-                            hintStyle: kHintTextStyle,
+                            hintStyle:
+                                kHintTextStyle(needWhite: colorIsSelectByUser),
                             labelText: "Example: Buy 1kg Sugar, 2pc Chocolate",
-                            labelStyle: kLabelTextStyle,
+                            labelStyle:
+                                kLabelTextStyle(needWhite: colorIsSelectByUser),
                             helperText:
                                 " Add Comma(,) after every task name ex. Chocolate, Lase",
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: Color(0xffcbcbcb),
+                                color: Color(colorIsSelectByUser
+                                    ? 0xffffffff
+                                    : 0xffcbcbcb),
                               ),
                             ),
                           ),
+                        ),
+                      ),
+                      SizedBox(height: 15),
+                      Container(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text("Choose date for this Task"),
+                            IconButton(
+                              icon: Icon(Icons.calendar_today),
+                              onPressed: clickCalender,
+                            ),
+                          ],
                         ),
                       ),
                       SizedBox(height: 15),
@@ -129,6 +156,7 @@ class _AddTodoTaskState extends State<AddTodoTask> {
                                 onTap: () {
                                   setState(() {
                                     selectedColorCode = color;
+                                    colorIsSelectByUser = true;
                                   });
                                 },
                                 child: Container(
@@ -170,6 +198,20 @@ class _AddTodoTaskState extends State<AddTodoTask> {
   }
 
   Todo todo = Todo();
+  clickCalender() async {
+    final DateTime? pickedDateTime = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(
+            DateTime.now().year, DateTime.now().month, DateTime.now().day),
+        lastDate: DateTime(2099));
+    if (pickedDateTime != null && pickedDateTime != finalDateTime) {
+      setState(() {
+        finalDateTime = pickedDateTime;
+      });
+    }
+  }
+
   addTaskToFirebase() async {
     setState(() {
       _isUploading = true;
@@ -183,6 +225,9 @@ class _AddTodoTaskState extends State<AddTodoTask> {
               color: selectedColorCode == null
                   ? colorCode[random.nextInt(5)]
                   : selectedColorCode!,
+              day: finalDateTime.day,
+              month: finalDateTime.month,
+              year: finalDateTime.year,
               timestamp: DateTime.now().microsecondsSinceEpoch,
               context: context)
           .whenComplete(() => {
